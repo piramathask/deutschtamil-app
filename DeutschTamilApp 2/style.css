@@ -956,3 +956,36 @@ button#btnWriteB1Nebensatz{
   .grid{ grid-template-columns: 1fr; }
 }
 
+/* ===== Legal (Impressum / Datenschutz) ===== */
+.legal-card{
+  font-size: 14px;
+}
+.legal-links{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.legal-links a{
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 800;
+}
+.legal-section{
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.legal-section p{
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.legal-note{
+  color: var(--muted);
+  font-size: 12px;
+}
+.legal-placeholder{
+  color: var(--muted);
+  font-weight: 700;
+}
+
