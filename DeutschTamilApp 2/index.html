@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeutschTamil Learn</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#5a7b6f" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="app-header"> 
+        <div class="flag-bar"></div>
+        <div class="title-row">
+          <span class="flag-emoji">🇩🇪</span>
+          <span class="app-title">DeutschTamil Learn</span>
+        </div>
+        <div class="app-subtitle">Einfach starten: Level wählen → Lektion wählen → Übung starten.</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card intro">
+      <h2>Level wählen</h2>
+      <p class="muted">Wähle dein Level. Danach kannst du eine Lektion anklicken und sofort üben.</p>
+      <div class="levels">
+        <button class="btn" data-level="A1">A1</button>
+        <button class="btn" data-level="A2">A2</button>
+        <button class="btn" data-level="B1">B1</button>
+        <button class="btn" data-level="B2">B2</button>
+      </div>
+    </section>
+
+    <section class="actions grid">
+      <button class="tile" id="btnGrammar">
+        <div class="tileTitle">Grammatik</div>
+        <div class="tileSub">Erklärung zur aktuellen Lektion</div>
+      </button>
+
+      <button class="tile" id="btnProgress">
+        <div class="tileTitle">Mein Fortschritt</div>
+        <div class="tileSub">Status pro Lektion</div>
+      </button>
+
+    </section>
+
+    <section class="card extras">
+      <details>
+        <summary>Extras anzeigen</summary>
+        <div class="extras-grid" style="margin-top:10px;">
+          <button class="btn big" id="btnGrammarExtra">📘 Grammatik Extra</button>
+          <button class="btn big" id="btnWriteMenu">✍️ Schreib Übungen</button>
+        </div>
+
+        <div id="writeModeBox" class="extras-grid" style="display:none; margin-top:10px;">
+          <button class="btn big" id="btnWritePresent">✍️ Schreiben – Präsens</button>
+          <button class="btn big" id="btnWritePerfect">✍️ Schreiben – Perfekt</button>
+          <button class="btn big" id="btnWriteB1Nebensatz">✍️ B1 – Nebensätze (weil / dass / obwohl)</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2 id="screenTitle">Start</h2>
+      <div id="screenBody"></div>
+    </section>
+
+    <!-- Übungen Listen -->
+    <div id="uebungList" style="display:none;"></div>
+
+    <!-- Einzelne Übung -->
+    <div id="uebungDetail" style="display:none;"></div>
+
+    <button class="install" id="btnInstall" hidden>Install App</button>
+  </main>
+
+  <script src="lessons.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,691 @@
+/* app.js — DeutschTamil Learn (stabil, Live Server)
+   - Level Buttons A1/A2/B1/B2
+   - Lesson List Screen
+   - Grammatik Screen
+   - Übungen Multi-Quiz + Next
+   - Grün/Rot im Satz
+   - Audio: Frage / Antwort / Erklärung (Deutsch)
+*/
+
+// 🔊 Deutsch Text-to-Speech (stabil)
+function speakDE(text) {
+  if (!("speechSynthesis" in window)) {
+    alert("Audio nicht unterstützt");
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "de-DE";
+  u.rate = 0.9;
+  u.pitch = 1;
+
+  function setVoiceAndSpeak() {
+    const voices = speechSynthesis.getVoices();
+    const deVoice = voices.find(v => v.lang.startsWith("de"));
+    if (deVoice) u.voice = deVoice;
+    speechSynthesis.speak(u);
+  }
+
+  if (speechSynthesis.getVoices().length === 0) {
+    speechSynthesis.onvoiceschanged = setVoiceAndSpeak;
+  } else {
+    setVoiceAndSpeak();
+  }
+}
+function shuffleCopy(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+
+
+
+let currentLevel = localStorage.getItem("dt_level") || "A1";
+let currentLessonId = localStorage.getItem("dt_lesson") || "";
+
+// quiz state
+let quizIndex = 0;
+let quizCorrect = 0;
+let currentAnswer = "";
+
+// Satzbau (order exercises)
+let orderSelected = [];
+let orderCorrectAnswer = "";
+
+
+const screenTitle = document.getElementById("screenTitle");
+const screenBody  = document.getElementById("screenBody");
+
+// cards/buttons (müssen in HTML existieren)
+const btnGrammar   = document.getElementById("btnGrammar");
+const btnExercises = document.getElementById("btnExercises");
+const btnListen    = document.getElementById("btnListen");
+const btnProgress  = document.getElementById("btnProgress");
+
+/* ---------- helpers ---------- */
+function getLessons(level) {
+  return (window.LESSONS && window.LESSONS[level]) ? window.LESSONS[level] : [];
+}
+
+function getLesson(level, id) {
+  const list = getLessons(level);
+  if (!list.length) return null;
+  return list.find(l => l.id === id) || list[0];
+}
+
+function ensureLessonSelected() {
+  const list = getLessons(currentLevel);
+  if (!list.length) {
+    currentLessonId = "";
+    localStorage.setItem("dt_lesson", "");
+    return;
+  }
+  if (!currentLessonId || !list.some(l => l.id === currentLessonId)) {
+    currentLessonId = list[0].id;
+    localStorage.setItem("dt_lesson", currentLessonId);
+  }
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+
+/* ---------- Progress (Lesson done) ---------- */
+function doneKey(id){ return "dt_done_" + id; }
+function isDone(id){ return localStorage.getItem(doneKey(id)) === "1"; }
+function markDone(id){ localStorage.setItem(doneKey(id), "1"); }
+
+function levelProgressPercent(level){
+  const list = getLessons(level);
+  if (!list.length) return 0;
+  const done = list.filter(l => isDone(l.id)).length;
+  return Math.round((done / list.length) * 100);
+}
+
+/* ---------- Audio (Deutsch TTS) ---------- */
+function speakDE(text){
+  if (!("speechSynthesis" in window)) {
+    alert("Audio (Text-to-Speech) wird in diesem Browser nicht unterstützt.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(String(text));
+  u.lang = "de-DE";
+  u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+
+/* ---------- Level Buttons bind ---------- */
+function bindLevelButtons(){
+  const levelBtns = document.querySelectorAll("[data-level]");
+  if (!levelBtns.length) return;
+
+  levelBtns.forEach(b => b.classList.remove("active"));
+  levelBtns.forEach(b => {
+    if (b.dataset.level === currentLevel) b.classList.add("active");
+  });
+
+  levelBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentLevel = btn.dataset.level;
+      localStorage.setItem("dt_level", currentLevel);
+
+      currentLessonId = ""; // reset -> first lesson
+      ensureLessonSelected();
+
+      levelBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      showHome();
+    });
+  });
+}
+
+/* ---------- HOME (Lesson list) ---------- */
+function showHome(){
+  ensureLessonSelected();
+  const list = getLessons(currentLevel);
+  const lesson = getLesson(currentLevel, currentLessonId);
+
+  screenTitle.textContent = `Level ${currentLevel} — Start`;
+  screenBody.innerHTML = `
+    <p><b>Aktuelle Lektion:</b> ${lesson ? escapeHtml(lesson.title) : "—"}</p>
+
+    <div style="margin:10px 0">
+      <div style="font-size:13px;opacity:.7">Level Fortschritt: ${levelProgressPercent(currentLevel)}%</div>
+      <div style="height:10px;border:1px solid #ddd;border-radius:999px;overflow:hidden">
+        <div style="height:100%;width:${levelProgressPercent(currentLevel)}%;background:#3498db"></div>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0;border:0;border-top:1px solid #eee">
+
+    <p><b>Lektionen (${currentLevel}):</b></p>
+
+    <div style="display:grid;gap:8px;margin-top:10px">
+      ${
+        list.length
+          ? list.map(l => `
+              <button type="button" class="btn" style="text-align:left" data-lesson="${l.id}">
+                ${isDone(l.id) ? "✅ " : ""}${escapeHtml(l.title)}
+              </button>
+            `).join("")
+          : `<p>இந்த level content பின்னர் update ஆகும்.</p>`
+      }
+    </div>
+
+    <p style="margin-top:12px;opacity:.8">
+      👉 "Grammatik" drücken für Erklärung. "Übungen" drücken für Quiz.
+    </p>
+  `;
+
+  document.querySelectorAll("[data-lesson]").forEach(b => {
+    b.addEventListener("click", () => {
+      currentLessonId = b.dataset.lesson;
+      localStorage.setItem("dt_lesson", currentLessonId);
+      showHome();
+    });
+  });
+}
+
+/* ---------- GRAMMAR ---------- */
+function showGrammar(){
+  ensureLessonSelected();
+  const lesson = getLesson(currentLevel, currentLessonId);
+  if (!lesson) {
+    screenTitle.textContent = "Content fehlt";
+    screenBody.innerHTML = `<p>${currentLevel} content später.</p>`;
+    return;
+  }
+
+  screenTitle.textContent = `${currentLevel} • ${lesson.title}`;
+  screenBody.innerHTML = `
+    <p><b>Deutsch:</b></p>
+    <ul>${(lesson.de || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+    <p style="margin-top:10px"><b>Tamil:</b></p>
+    <ul>${(lesson.ta || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <button type="button" class="btn" id="btnSpeakExplain">🔊 Erklärung (DE)</button>
+      <button type="button" class="btn" id="btnBackHome">Back</button>
+    </div>
+  `;
+
+  document.getElementById("btnBackHome").addEventListener("click", showHome);
+  document.getElementById("btnSpeakExplain").addEventListener("click", () => {
+    const exp = (lesson.explain_de && lesson.explain_de.length)
+      ? lesson.explain_de.join(" ")
+      : (lesson.de ? lesson.de.join(" ") : "Keine Erklärung vorhanden.");
+    speakDE(exp);
+  });
+}
+
+/* ---------- EXERCISES ---------- */
+function showExercises(reset = true){
+  ensureLessonSelected();
+  const lesson = getLesson(currentLevel, currentLessonId);
+  if (!lesson || !Array.isArray(lesson.quiz) || !lesson.quiz.length){
+    screenTitle.textContent = "Übungen fehlen";
+    screenBody.innerHTML = `<p>Für diese Lektion sind keine Übungen gespeichert.</p><button class="btn" onclick="showHome()">Back</button>`;
+    return;
+  }
+  if (reset) { quizIndex = 0; quizCorrect = 0; }
+  renderQuestion(lesson);
+}
+
+function renderQuestion(lesson){
+  const quiz = lesson.quiz;
+  const q = quiz[quizIndex]; 
+  // WRITE-ÜBUNG (User schreibt selbst)
+if (q.type === "write") {
+  renderWriteQuestion(q, lesson);
+  return;
+}
+
+  if (q.type === "wordorder") {
+  renderWordOrder(q);
+  return;
+}
+
+  currentAnswer = q.answer;
+
+// für Satzbau (falls vorhanden)
+orderSelected = [];
+orderCorrectAnswer = q.answer;
+
+
+  const quizPercent = Math.round((quizIndex / quiz.length) * 100);
+
+  screenTitle.textContent = `Übungen: ${lesson.title} (${quizIndex + 1}/${quiz.length})`;
+  screenBody.innerHTML = `
+    <div style="margin-bottom:10px">
+      <div style="font-size:13px;opacity:.7">Quiz Fortschritt: ${quizPercent}%</div>
+      <div style="height:10px;border:1px solid #ddd;border-radius:999px;overflow:hidden">
+        <div style="height:100%;width:${quizPercent}%;background:#2ecc71"></div>
+      </div>
+    </div>
+
+    <p style="margin-top:12px"><b>Frage:</b> <span id="qSentence">${escapeHtml(q.q)}</span></p>
+
+    
+
+    <div id="options" style="display:grid;gap:10px;margin-top:10px;max-width:360px">
+      ${q.options.map(opt => `
+        <button type="button" class="btn option-btn" data-opt="${escapeHtml(opt)}">
+          ${escapeHtml(opt)}
+        </button>
+      `).join("")}
+    </div>
+
+    <p id="result" style="margin-top:12px;font-weight:800"></p>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+  <button type="button" class="btn" id="btnSpeakQ">🔊 Frage</button>
+  <button type="button" class="btn" id="btnSpeakA">🔊 Antwort</button>
+  <button type="button" class="btn" id="btnSpeakExp">🔊 Erklärung</button>
+</div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <button type="button" class="btn" id="btnNext">Next ➜</button>
+      <button type="button" class="btn" id="btnRestart">Restart</button>
+      <button type="button" class="btn" id="btnBack">Back</button>
+    </div>
+
+    <p style="margin-top:10px;opacity:.8">Score: <b>${quizCorrect}</b> / ${quiz.length}</p>
+  `;
+  // 🔊 AUDIO-BUTTONS (NACH innerHTML!)
+document.getElementById("btnSpeakQ")?.addEventListener("click", () => {
+  speakDE(q.q.replace("___", "…"));
+});
+
+document.getElementById("btnSpeakA")?.addEventListener("click", () => {
+  speakDE(q.q.replace("___", currentAnswer));
+});
+
+document.getElementById("btnSpeakExp")?.addEventListener("click", () => {
+  const expDE = (lesson.explain_de && lesson.explain_de.length)
+    ? lesson.explain_de.join(" ")
+    : (lesson.de ? lesson.de.join(" ") : "Keine Erklärung vorhanden.");
+
+  const expTA = (lesson.explain_ta && lesson.explain_ta.length)
+    ? lesson.explain_ta.join(" ")
+    : "";
+
+  const r = document.getElementById("result");
+  if (r) {
+    r.innerHTML = `
+      <div style="margin-top:8px">
+        <b>Erklärung (Deutsch):</b><br>${escapeHtml(expDE)}<br><br>
+        ${expTA ? `<b>விளக்கம் (Tamil):</b><br>${escapeHtml(expTA)}` : ""}
+      </div>
+    `;
+  }
+
+  speakDE(expDE);
+});
+
+
+  // Audio buttons (NACH innerHTML!)
+  document.getElementById("btnSpeakQ").addEventListener("click", () => {
+    speakDE(q.q.replace("___", "…"));
+  });
+  document.getElementById("btnSpeakA").addEventListener("click", () => {
+    speakDE(q.q.replace("___", currentAnswer));
+  });
+document.getElementById("btnSpeakExp").addEventListener("click", () => {
+  const expDE = (lesson.explain_de && lesson.explain_de.length)
+    ? lesson.explain_de.join(" ")
+    : (lesson.de ? lesson.de.join(" ") : "Keine Erklärung vorhanden.");
+
+  const expTA = (lesson.explain_ta && lesson.explain_ta.length)
+    ? lesson.explain_ta.join(" ")
+    : "";
+
+  const r = document.getElementById("result");
+  if (r) {
+    r.innerHTML = `
+      <div style="margin-top:8px">
+        <b>Erklärung (Deutsch):</b><br>${escapeHtml(expDE)}<br><br>
+        ${expTA ? `<b>விளக்கம் (Tamil):</b><br>${escapeHtml(expTA)}` : ""}
+      </div>
+    `;
+  }
+
+  // 🔊 Audio: nur Deutsch
+  speakDE(expDE);
+});
+
+
+  // Answer buttons
+  document.querySelectorAll(".option-btn").forEach(btn => {
+    btn.addEventListener("click", () => checkAnswer(btn));
+  });
+
+  document.getElementById("btnNext").addEventListener("click", nextQuestion);
+  document.getElementById("btnRestart").addEventListener("click", () => showExercises(true));
+  document.getElementById("btnBack").addEventListener("click", showHome);
+}
+
+function checkAnswer(btnEl){ 
+
+  const chosen = btnEl.dataset.opt;
+  const r = document.getElementById("result");
+  const qEl = document.getElementById("qSentence");
+  const original = qEl ? qEl.textContent : "";
+ 
+  
+function enableWrongWordEditing() {
+  document.querySelectorAll(".wrong").forEach(word => {
+    word.style.cursor = "pointer";
+    word.onclick = () => {
+      const neu = prompt("Anderes Wort eingeben:", word.textContent);
+      if (neu) {
+        word.textContent = neu.trim();
+        checkAnswer({ dataset: { opt: null } });
+      }
+    };
+  });
+}
+
+
+  // disable all buttons after first click
+  const allBtns = Array.from(document.querySelectorAll(".option-btn"));
+  allBtns.forEach(b => (b.disabled = true));
+
+  if (chosen === currentAnswer) {
+    if (qEl) {
+      qEl.innerHTML = original.replace("___", `<span style="color:green;font-weight:bold">${currentAnswer}</span>`);
+    }
+    btnEl.style.background = "#2ecc71";
+    btnEl.style.color = "#fff";
+    r.innerHTML = "✅ <span style='color:green;font-weight:bold'>Richtig!</span>";
+    quizCorrect++;
+    speakDE(original.replace("___", currentAnswer));
+  } else {
+    if (qEl) {
+      qEl.innerHTML = original.replace("___", `<span style="color:red;font-weight:bold">${chosen}</span>`);
+    }
+    btnEl.style.background = "#e74c3c";
+    btnEl.style.color = "#fff";
+
+    // highlight correct button green
+    const correctBtn = allBtns.find(b => b.dataset.opt === currentAnswer);
+    if (correctBtn) {
+      correctBtn.style.background = "#2ecc71";
+      correctBtn.style.color = "#fff";
+    }
+
+    r.innerHTML = `❌ <span style='color:red;font-weight:bold'>Falsch</span> — richtig: <span style='color:green;font-weight:bold'>${currentAnswer}</span>`;
+  enableWrongWordEditing();
+
+  }
+
+}
+
+function nextQuestion(){
+  const lesson = getLesson(currentLevel, currentLessonId);
+  if (!lesson) return;
+
+  quizIndex++;
+
+  if (quizIndex >= lesson.quiz.length) {
+    const total = lesson.quiz.length;
+    const percent = Math.round((quizCorrect / total) * 100);
+    if (percent >= 70) markDone(lesson.id);
+
+    screenTitle.textContent = `Fertig: ${lesson.title}`;
+    screenBody.innerHTML = `
+      <p><b>Result:</b> ${quizCorrect} / ${total} (${percent}%)</p>
+      <p>${percent >= 70 ? "✅ Lektion abgeschlossen!" : "❌ Bitte nochmal (70% nötig)."} </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button class="btn" onclick="showExercises(true)">Restart</button>
+        <button class="btn" onclick="showHome()">Home</button>
+      </div>
+    `;
+    return;
+  }
+
+  renderQuestion(lesson);
+}
+
+/* ---------- Card Buttons ---------- */
+if (btnGrammar)   btnGrammar.addEventListener("click", showGrammar);
+if (btnExercises) btnExercises.addEventListener("click", () => showExercises(true));
+if (btnListen) {
+  btnListen.addEventListener("click", () => {
+    screenTitle.textContent = "Hören & Sprechen (später)";
+    screenBody.innerHTML = `
+      <p>Später können wir hinzufügen:</p>
+      <ul>
+        <li>Audio pronunciation</li>
+        <li>Repeat after me</li>
+        <li>Dialoge</li>
+      </ul>
+      <button class="btn" onclick="showHome()">Back</button>
+    `;
+  });
+}
+if (btnProgress) {
+  btnProgress.addEventListener("click", () => {
+    const list = getLessons(currentLevel);
+    screenTitle.textContent = "Mein Fortschritt / முன்னேற்றம்";
+    screenBody.innerHTML = `
+      <p><b>Level:</b> ${currentLevel}</p>
+      <p><b>Progress:</b> ${levelProgressPercent(currentLevel)}%</p>
+      <hr style="margin:12px 0;border:0;border-top:1px solid #eee">
+      <div style="display:grid;gap:8px">
+        ${list.map(l => `<div>${isDone(l.id) ? "✅" : "⬜"} ${escapeHtml(l.title)}</div>`).join("")}
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn" onclick="showHome()">Back</button>
+      </div>
+    `;
+  });
+}
+
+function renderWordOrder(q) {
+  let selected = [];
+
+  screenTitle.textContent = "Wörter sortieren";
+
+  screenBody.innerHTML = `
+    <p><b>${escapeHtml(q.q)}</b></p>
+
+    <div id="wordPool" style="display:flex;gap:8px;flex-wrap:wrap">
+      ${shuffleCopy(q.words).map(w => `
+
+        <button type="button" class="btn word-btn" data-word="${escapeHtml(w)}">${escapeHtml(w)}</button>
+      `).join("")}
+    </div>
+
+    <p style="margin-top:12px"><b>Dein Satz:</b></p>
+    <div id="sentenceBox" style="min-height:40px;border:1px dashed #999;padding:8px;border-radius:8px"></div>
+
+    <p id="result" style="margin-top:10px;font-weight:800"></p>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <button type="button" class="btn" id="btnReset">Reset</button>
+      <button type="button" class="btn" id="btnCheck">Prüfen</button>
+      <button type="button" class="btn" id="btnNext">Next ➜</button>
+    </div>
+  `;
+function renderWriteQuestion(q, lesson) {
+  screenTitle.textContent = `Übungen: ${lesson.title}`;
+  screenBody.innerHTML = `
+    <p><b>Frage:</b> ${q.q}</p>
+
+    <input id="writeInput" type="text"
+      placeholder="Verb schreiben..."
+      style="width:100%;max-width:360px;padding:12px;border-radius:10px">
+
+    <div style="margin-top:12px">
+      <button class="btn" id="btnWriteCheck">Prüfen</button>
+      <button class="btn" id="btnNext" disabled>Next</button>
+    </div>
+
+    <p id="result" style="margin-top:10px;font-weight:bold"></p>
+  `;
+
+  document.getElementById("btnWriteCheck")
+    .addEventListener("click", () => checkWriteAnswer(q));
+  document.getElementById("btnNext")
+    .addEventListener("click", nextQuestion);
+}
+function renderWriteQuestion(q, lesson) {
+  // Fortschritt
+  const quiz = lesson.quiz || [];
+  const quizPercent = quiz.length ? Math.round((quizIndex / quiz.length) * 100) : 0;
+
+  screenTitle.textContent = `Übungen: ${lesson.title} (${quizIndex + 1}/${quiz.length})`;
+
+  screenBody.innerHTML = `
+    <div style="margin-bottom:10px">
+      <div style="font-size:13px;opacity:.7">Quiz Fortschritt: ${quizPercent}%</div>
+      <div style="height:10px;border:1px solid #ddd;border-radius:999px;overflow:hidden">
+        <div style="height:100%;width:${quizPercent}%;background:#2ecc71"></div>
+      </div>
+    </div>
+
+    <p style="margin-top:12px"><b>Frage:</b> <span id="qSentence">${escapeHtml(q.q || "")}</span></p>
+
+    <input id="writeInput" type="text"
+      placeholder="Antwort eingeben…"
+      style="width:100%;max-width:360px;padding:10px;border:1px solid #ddd;border-radius:10px;margin-top:10px">
+
+    <p id="result" style="margin-top:12px;font-weight:800"></p>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <button type="button" class="btn" id="btnCheckWrite">Prüfen</button>
+      <button type="button" class="btn" id="btnNext">Weiter</button>
+      <button type="button" class="btn" id="btnRestart">Restart</button>
+      <button type="button" class="btn" id="btnBack">Back</button>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <button type="button" class="btn" id="btnSpeakQ">Frage</button>
+      <button type="button" class="btn" id="btnSpeakA">Antwort</button>
+      <button type="button" class="btn" id="btnSpeakHint">Erklärung</button>
+    </div>
+  `;
+
+  const input = document.getElementById("writeInput");
+  const result = document.getElementById("result");
+  const btnCheck = document.getElementById("btnCheckWrite");
+
+  // Hilfsfunktionen
+  const norm = (s) => String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+
+  let checkedOnce = false;
+
+  btnCheck.addEventListener("click", () => {
+    if (checkedOnce) return;
+
+    const user = norm(input.value);
+    const correct = norm(q.answer);
+
+    if (!correct) {
+      result.innerHTML = `⚠️ <span style="color:#e67e22">Keine richtige Antwort im lessons.js gesetzt.</span>`;
+      return;
+    }
+
+    if (user === correct) {
+      result.innerHTML = `✅ <span style="color:green">Richtig!</span>`;
+      quizCorrect++;
+    } else {
+      result.innerHTML = `❌ <span style="color:red">Falsch</span> – richtig: <b>${escapeHtml(q.answer)}</b><br>${q.hint ? "Tipp: " + escapeHtml(q.hint) : ""}`;
+    }
+
+    checkedOnce = true;
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") btnCheck.click();
+  });
+
+  document.getElementById("btnNext").addEventListener("click", nextQuestion);
+  document.getElementById("btnRestart").addEventListener("click", () => showExercises(true));
+  document.getElementById("btnBack").addEventListener("click", showHome);
+
+  // Audio
+  document.getElementById("btnSpeakQ").addEventListener("click", () => speakDE((q.q || "").replace("___", "…")));
+  document.getElementById("btnSpeakA").addEventListener("click", () => speakDE(String(q.answer || "")));
+  document.getElementById("btnSpeakHint").addEventListener("click", () => speakDE(String(q.hint || "")));
+
+  // Fokus direkt ins Feld
+  input.focus();
+}
+
+function checkWriteAnswer(q) {
+  const input = document.getElementById("writeInput");
+  const user = input.value.trim().toLowerCase();
+  const correct = q.answer.trim().toLowerCase();
+
+  const r = document.getElementById("result");
+  const btnNext = document.getElementById("btnNext");
+
+  if (user === correct) {
+    r.textContent = "✅ Richtig!";
+    btnNext.disabled = false;
+  } else {
+    r.textContent = "❌ Falsch – ändere das Verb und prüfe nochmal.";
+    btnNext.disabled = true;
+    input.focus();
+    input.select();
+  }
+}
+
+  const updateSentence = () => {
+    let sentence = selected.join(" ");
+sentence = sentence.replace(/\s+([.,!?])/g, "$1");
+document.getElementById("sentenceBox").textContent = sentence;
+
+  };
+
+  document.querySelectorAll(".word-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selected.push(btn.dataset.word);
+      btn.disabled = true;
+      updateSentence();
+    });
+  });
+
+  document.getElementById("btnReset").addEventListener("click", () => {
+    selected = [];
+    document.getElementById("result").textContent = "";
+    document.querySelectorAll(".word-btn").forEach(b => b.disabled = false);
+    updateSentence();
+  });
+
+  document.getElementById("btnCheck").addEventListener("click", () => {
+    let userSentence = selected.join(" ").trim();
+userSentence = userSentence.replace(/\s+([.,!?])/g, "$1");
+
+    const r = document.getElementById("result");
+
+    if (userSentence === q.answer) {
+      r.innerHTML = `✅ <span style="color:green">Richtig!</span> <br><b>${escapeHtml(q.answer)}</b>`;
+      if (typeof speakDE === "function") speakDE(q.answer);
+    } else {
+      r.innerHTML = `❌ <span style="color:red">Falsch</span><br>✔ Richtig: <b>${escapeHtml(q.answer)}</b>`;
+    }
+  });
+
+  document.getElementById("btnNext").addEventListener("click", nextQuestion);
+}
+
+
+
+/* ---------- START ---------- */
+bindLevelButtons();
+showHome();
+
