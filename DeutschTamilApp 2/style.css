@@ -960,23 +960,37 @@ button#btnWriteB1Nebensatz{
 .legal-card{
   font-size: 14px;
 }
-.legal-links{
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
-}
-.legal-links a{
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 800;
-}
-.legal-section{
-  margin-top: 12px;
-  padding-top: 10px;
+.legal-toggle{
   border-top: 1px dashed var(--border);
+  padding-top: 6px;
 }
-.legal-section p{
+.legal-toggle:first-child{
+  border-top: 0;
+  padding-top: 0;
+}
+.legal-toggle summary{
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 800;
+  box-shadow: var(--shadow-soft);
+}
+.legal-toggle summary::-webkit-details-marker{ display: none; }
+.legal-toggle[open] summary{
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.legal-content{
+  margin-top: 10px;
+}
+.legal-content p{
   margin-top: 6px;
   line-height: 1.5;
 }
