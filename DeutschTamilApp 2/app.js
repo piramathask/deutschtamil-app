@@ -246,14 +246,14 @@ function getExerciseExplanation(q) {
 
 function getLessonExplanation(lesson) {
   const de = (lesson?.explain_de && lesson.explain_de.length)
-    ? lesson.explain_de.join(" ")
-    : (lesson?.de ? lesson.de.join(" ") : "Keine Erklärung vorhanden.");
+    ? lesson.explain_de
+    : (lesson?.de && lesson.de.length ? lesson.de : ["Keine Erklärung vorhanden."]);
   const ta = (lesson?.explain_ta && lesson.explain_ta.length)
-    ? lesson.explain_ta.join(" ")
-    : (lesson?.ta ? lesson.ta.join(" ") : "Tamil Erklärung fehlt.");
+    ? lesson.explain_ta
+    : (lesson?.ta && lesson.ta.length ? lesson.ta : ["Tamil Erklärung fehlt."]);
   const en = (lesson?.explain_en && lesson.explain_en.length)
-    ? lesson.explain_en.join(" ")
-    : "";
+    ? lesson.explain_en
+    : [];
   return { de, ta, en };
 }
 
@@ -271,12 +271,16 @@ function renderLessonGrammarBox(lesson) {
   const exp = getLessonExplanation(lesson);
   const lang = getGrammarLangPref();
 
-  let content = `<b>Grammatik (Deutsch):</b><br>${escapeHtml(exp.de)}`;
-  if (lang === "de-en" && exp.en) {
-    content += `<br><br><b>Grammar (English):</b><br>${escapeHtml(exp.en)}`;
+  const deHtml = exp.de.map(line => escapeHtml(line)).join("<br>");
+  const taHtml = exp.ta.map(line => escapeHtml(line)).join("<br>");
+  const enHtml = exp.en.map(line => escapeHtml(line)).join("<br>");
+
+  let content = `<b>Grammatik (Deutsch):</b><br>${deHtml}`;
+  if (lang === "de-en" && exp.en.length) {
+    content += `<br><br><b>Grammar (English):</b><br>${enHtml}`;
   }
   if (lang === "de-ta") {
-    content += `<br><br><b>இலக்கணம் (Tamil):</b><br>${escapeHtml(exp.ta)}`;
+    content += `<br><br><b>இலக்கணம் (Tamil):</b><br>${taHtml}`;
   }
 
   box.innerHTML = `
