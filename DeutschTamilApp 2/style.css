@@ -70,6 +70,16 @@ body{
   cursor: pointer;
 }
 #options { display:grid; gap:10px; max-width:340px; }
+.btn-stack{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  align-items:center;
+  line-height:1.1;
+}
+.btn-title{font-weight:800;}
+.btn-sub{font-size:11px;opacity:.7;font-weight:600;}
+#options { display:grid; gap:10px; max-width:340px; }
 .option-btn { width: 100%; }
 
 .option-btn { width: 100%; }

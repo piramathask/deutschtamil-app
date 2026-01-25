@@ -994,7 +994,7 @@ function showGrammarExtraHome() {
   if (!ensureScreenElements()) return;
   screenTitle.textContent = "📘 Grammatik Extra";
   screenBody.innerHTML = `
-    <p style="opacity:.8">Große Grammatik-Erklärungen (A2/B1)</p>
+    <p style="opacity:.8">Detailed grammar explanations (A2/B1)</p>
       <div style="margin:12px 0 14px">
     <label style="font-weight:700">Explanation:</label>
 
@@ -1136,17 +1136,17 @@ function getCategory(lesson) {
 
   const t = String(lesson?.title || "").toLowerCase();
   // ✅ A1 Grundlagen FIRST
-  if (t.includes("artikel")) return "A1 Grundlagen";
-  if (t.includes("plural")) return "A1 Grundlagen";
-  if (t.includes("satzstellung") || t.includes("verb position 2")) return "A1 Grundlagen";
+  if (t.includes("artikel")) return "A1 Basics";
+  if (t.includes("plural")) return "A1 Basics";
+  if (t.includes("satzstellung") || t.includes("verb position 2")) return "A1 Basics";
 
-  if (t.includes("personalpronomen") || t.includes("pronomen")) return "A1 Grundlagen";
-  if (t.includes("sein und haben") || (t.includes("sein") && t.includes("haben"))) return "A1 Grundlagen";
-  if (t.includes("präsens")) return "A1 Grundlagen";
-  if (t.includes("satzstellung")) return "A1 Grundlagen";
-  if (t.includes("nicht und kein") || t.includes("nicht") || t.includes("kein")) return "A1 Grundlagen";
-  if (t.includes("fragen")) return "A1 Grundlagen";
-  if (t.includes("akkusativ")) return "A1 Grundlagen";
+  if (t.includes("personalpronomen") || t.includes("pronomen")) return "A1 Basics";
+  if (t.includes("sein und haben") || (t.includes("sein") && t.includes("haben"))) return "A1 Basics";
+  if (t.includes("präsens")) return "A1 Basics";
+  if (t.includes("satzstellung")) return "A1 Basics";
+  if (t.includes("nicht und kein") || t.includes("nicht") || t.includes("kein")) return "A1 Basics";
+  if (t.includes("fragen")) return "A1 Basics";
+  if (t.includes("akkusativ")) return "A1 Basics";
 
   if (t.includes("präposition")) return "Präpositionen";
   if (t.includes("perfekt")) return "Perfekt";
@@ -1168,7 +1168,7 @@ if (
   t.includes("wörter sortieren") ||
   t.includes("satz bauen") ||
   t.includes("wortstellung")
-) return "A1 Grundlagen";
+) return "A1 Basics";
 
   return "Sonstiges";
 }
@@ -1184,7 +1184,7 @@ function groupByCategory(list) {
 }
 
 const CATEGORY_ORDER = [
-  "A1 Grundlagen",
+  "A1 Basics",
   "Perfekt",
   "Nebensätze",
   "Präpositionen",
@@ -1218,9 +1218,9 @@ function showHome(){
     <hr style="margin:12px 0;border:0;border-top:1px solid #eee">
 
     <div class="howto">
-      <div class="howto-step"><span class="step-num">1</span> Lektion wählen</div>
-      <div class="howto-step"><span class="step-num">2</span> Übung starten</div>
-      <div class="howto-step"><span class="step-num">3</span> Aufgaben lösen</div>
+      <div class="howto-step"><span class="step-num">1</span> Choose a lesson</div>
+      <div class="howto-step"><span class="step-num">2</span> Start practice</div>
+      <div class="howto-step"><span class="step-num">3</span> Solve tasks</div>
     </div>
 
     <p><b>Lektionen (${currentLevel}):</b></p>
@@ -1310,11 +1310,11 @@ if (grouped["Sonstiges"]) {
     el.className = "exercise-start";
     el.innerHTML = `
       <div class="start-card">
-        <div class="start-title">Übung starten</div>
-        <div class="start-sub">Bitte eine Lektion wählen.</div>
+        <div class="start-title">Start practice</div>
+        <div class="start-sub">Please choose a lesson.</div>
         <div class="btn-row">
-          <button type="button" class="btn primary" data-start-lesson>Übung starten</button>
-          <button type="button" class="btn" data-change-lesson>Andere Lektion</button>
+          <button type="button" class="btn primary" data-start-lesson>Start practice</button>
+          <button type="button" class="btn" data-change-lesson>Other lesson</button>
         </div>
       </div>
     `;
@@ -1360,8 +1360,8 @@ if (grouped["Sonstiges"]) {
       const start = ensureStartEl();
       const title = start.querySelector(".start-title");
       const sub = start.querySelector(".start-sub");
-      if (title) title.textContent = "Übung starten";
-      if (sub) sub.textContent = `Lektion: ${b.querySelector(".lesson-title")?.textContent || ""}`;
+      if (title) title.textContent = "Start practice";
+      if (sub) sub.textContent = `Lesson: ${b.querySelector(".lesson-title")?.textContent || ""}`;
       b.insertAdjacentElement("afterend", start);
     });
   });
@@ -1426,9 +1426,9 @@ function showExercisesHome() {
   ensureLessonSelected();
   const list = getLessons(currentLevel);
 
-  screenTitle.textContent = `Übungen – Liste (${currentLevel})`;
+  screenTitle.textContent = `Practice – List (${currentLevel})`;
   screenBody.innerHTML = `
-    <p style="opacity:.8">Wähle eine Lektion. Dann erscheint „Übung starten“.</p>
+    <p style="opacity:.8">Choose a lesson. Then “Start practice” will appear.</p>
 
     <div class="exercise-wrap" style="margin-top:10px">
       <div class="exercise-list" id="exerciseList">
@@ -1448,11 +1448,11 @@ function showExercisesHome() {
 
       <div class="exercise-start" id="exerciseStart" hidden>
         <div class="start-card">
-          <div class="start-title" id="startTitle">Übung starten</div>
-          <div class="start-sub" id="startSub">Bitte eine Lektion wählen.</div>
+          <div class="start-title" id="startTitle">Start practice</div>
+          <div class="start-sub" id="startSub">Please choose a lesson.</div>
           <div class="btn-row">
-            <button type="button" class="btn primary" id="btnStartLesson">Übung starten</button>
-            <button type="button" class="btn" id="btnChangeLesson">Andere Lektion</button>
+            <button type="button" class="btn primary" id="btnStartLesson">Start practice</button>
+            <button type="button" class="btn" id="btnChangeLesson">Other lesson</button>
           </div>
         </div>
       </div>
@@ -1476,8 +1476,8 @@ function showExercisesHome() {
       localStorage.setItem("dt_lesson", currentLessonId);
       if (listEl) listEl.classList.add("blurred");
       if (startEl) startEl.hidden = false;
-      if (startTitle) startTitle.textContent = "Übung starten";
-      if (startSub) startSub.textContent = `Lektion: ${b.querySelector(".lesson-title")?.textContent || ""}`;
+      if (startTitle) startTitle.textContent = "Start practice";
+      if (startSub) startSub.textContent = `Lesson: ${b.querySelector(".lesson-title")?.textContent || ""}`;
     });
   });
 
@@ -1587,12 +1587,30 @@ orderCorrectAnswer = q.answer;
 
 
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-  <button type="button" class="btn" id="btnSpeakQ">🔊 Frage</button>
-  <button type="button" class="btn" id="btnSpeakA">🔊 Antwort</button>
-  <button type="button" class="btn" id="btnSpeakExp">🔊 Erklärung</button>
-  <button type="button" class="btn" id="btnSpeakRepeat">🗣️ Sprich nach</button>
-  <button type="button" class="btn" id="btnGrammarExp">📘 Grammatik</button>
-  <button type="button" class="btn" id="btnShowSolution">✅ Lösung</button>
+  <button type="button" class="btn btn-stack" id="btnSpeakQ">
+    <span class="btn-title">🔊 Frage</span>
+    <span class="btn-sub">Question</span>
+  </button>
+  <button type="button" class="btn btn-stack" id="btnSpeakA">
+    <span class="btn-title">🔊 Antwort</span>
+    <span class="btn-sub">Answer</span>
+  </button>
+  <button type="button" class="btn btn-stack" id="btnSpeakExp">
+    <span class="btn-title">🔊 Erklärung</span>
+    <span class="btn-sub">Explanation</span>
+  </button>
+  <button type="button" class="btn btn-stack" id="btnSpeakRepeat">
+    <span class="btn-title">🗣️ Sprich nach</span>
+    <span class="btn-sub">Repeat</span>
+  </button>
+  <button type="button" class="btn btn-stack" id="btnGrammarExp">
+    <span class="btn-title">📘 Grammatik</span>
+    <span class="btn-sub">Grammar</span>
+  </button>
+  <button type="button" class="btn btn-stack" id="btnShowSolution">
+    <span class="btn-title">✅ Lösung</span>
+    <span class="btn-sub">Solution</span>
+  </button>
 
 </div>
 

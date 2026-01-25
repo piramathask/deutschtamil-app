@@ -138,7 +138,7 @@ window.LESSONS = {
       ],
       quiz: [
         // 1–20 Pronomen
-        { q: "___ bin Thas.", options: ["Ich","Du","Er"], answer: "Ich" },
+        { q: "___ bin Pirama.", options: ["Ich","Du","Er"], answer: "Ich" },
         { q: "___ bist hier.", options: ["Ich","Du","Sie"], answer: "Du" },
         { q: "___ ist Maria.", options: ["Er","Sie","Es"], answer: "Sie" },
         { q: "___ ist ein Kind.", options: ["Er","Sie","Es"], answer: "Es" },
@@ -191,7 +191,7 @@ window.LESSONS = {
         { q: "Wir ___ in Duisburg.", options: ["sind","seid","ist"], answer: "sind" },
         { q: "Ihr ___ in Bonn.", options: ["sind","seid","ist"], answer: "seid" },
         { q: "Sie ___ in Hamburg. (formal)", options: ["sind","seid","ist"], answer: "sind" },
-        { q: "Ich ___ Thas.", options: ["bin","bist","ist"], answer: "bin" },
+        { q: "Ich ___ Pirama.", options: ["bin","bist","ist"], answer: "bin" },
         { q: "Du ___ Mohan.", options: ["bin","bist","ist"], answer: "bist" },
         { q: "Er ___ Ali.", options: ["bin","bist","ist"], answer: "ist" },
         { q: "Wir ___ Freunde.", options: ["sind","seid","ist"], answer: "sind" },
@@ -1660,19 +1660,40 @@ Ich   kaufe   im Supermarkt   ein.
     "விருப்பு, கட்டாயம், திறன்"
   ],
   explain_de: [
-    "können = Fähigkeit / Möglichkeit",
-    "müssen = Pflicht",
-    "wollen = Wunsch"
+    "Im Deutschen steht das konjugierte Verb immer an Position 2.",
+    "Bei Modalverben ist das Modalverb konjugiert.",
+    "Das zweite Verb bleibt im Infinitiv und geht ans Satzende.",
+    "Beispiele:",
+    "Ich kann Deutsch lernen. (kann = Position 2, lernen = am Ende)",
+    "Er muss heute arbeiten. (muss = Position 2, arbeiten = am Ende)",
+    "Wir wollen nach Deutschland fahren.",
+    "❌ Falsch (typischer Fehler): Ich kann lernen Deutsch. / Ich lernen Deutsch kann.",
+    "Frageform: Modalverb an Position 1, Infinitiv am Ende.",
+    "👉 Kann ich Deutsch lernen?"
   ],
   explain_en: [
-    "können = ability / possibility",
-    "müssen = obligation",
-    "wollen = wish / want"
+    "In German, the conjugated verb is always in position 2.",
+    "With modal verbs, the modal verb is conjugated.",
+    "The second verb stays in the infinitive and goes to the end of the sentence.",
+    "Examples:",
+    "I can learn German. (kann = position 2, lernen = at the end)",
+    "He must work today. (muss = position 2, arbeiten = at the end)",
+    "We want to go to Germany.",
+    "❌ Wrong (typical mistake): I can learn German. / I learn German can.",
+    "Question form: modal verb in position 1, infinitive at the end.",
+    "👉 Can I learn German?"
   ],
   explain_ta: [
-    "können = முடியும்",
-    "müssen = கட்டாயம்",
-    "wollen = விரும்புதல்"
+    "ஜெர்மனில் மாற்றம் பெறும் verb (konjugiert) எப்போதும் 2‑வது இடத்தில் வரும்.",
+    "Modalverb உள்ளால், Modalverb தான் மாற்றம் பெறும்.",
+    "இரண்டாவது verb infinitiv‑ல் இருந்து வாக்கியத்தின் இறுதியில் வரும்.",
+    "உதாரணங்கள்:",
+    "Ich kann Deutsch lernen. (kann = இடம் 2, lernen = கடைசியில்)",
+    "Er muss heute arbeiten. (muss = இடம் 2, arbeiten = கடைசியில்)",
+    "Wir wollen nach Deutschland fahren.",
+    "❌ தவறு (அடிக்கடி பிழை): Ich kann lernen Deutsch. / Ich lernen Deutsch kann.",
+    "கேள்வி வடிவம்: Modalverb இடம் 1, infinitiv கடைசியில்.",
+    "👉 Kann ich Deutsch lernen?"
   ],
   quiz: [
     // 🔹 KÖNNEN
