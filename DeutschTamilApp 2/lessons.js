@@ -1019,6 +1019,83 @@ window.LESSONS = {
   ]
 },
 
+{
+  id: "A1-L11",
+  title: "Trennbare Verben (A1)",
+  de: [
+    "Trennbare Verben haben eine Vorsilbe (an-, auf-, ein-, aus-).",
+    "Im Satz steht die Vorsilbe am Ende: Ich rufe dich an."
+  ],
+  ta: [
+    "Trennbare verb-களில் Vorsilbe இருக்கும் (an-, auf-, ein-, aus-).",
+    "வாக்கியத்தில் Vorsilbe கடைசியில் வரும்: Ich rufe dich an."
+  ],
+  explain_de: [
+    "Trennbare Verben = Verb + Vorsilbe (anrufen, aufstehen, einkaufen).",
+    "Im Hauptsatz: Verb an Position 2, Vorsilbe am Ende.",
+    "Beispiel: Ich rufe ihn an. / Wir stehen um 6 Uhr auf.",
+    "Im Infinitiv bleibt es zusammen: anrufen, aufstehen."
+  ],
+  explain_en: [
+    "Separable verbs = verb + prefix (anrufen, aufstehen, einkaufen).",
+    "In a main clause: verb in position 2, prefix at the end.",
+    "Example: Ich rufe ihn an. / Wir stehen um 6 Uhr auf.",
+    "In the infinitive they stay together: anrufen, aufstehen."
+  ],
+  explain_ta: [
+    "Trennbare verb-கள் = verb + Vorsilbe (anrufen, aufstehen, einkaufen).",
+    "முக்கிய வாக்கியத்தில் verb இடம் 2; Vorsilbe கடைசியில் வரும்.",
+    "உதாரணம்: Ich rufe ihn an. / Wir stehen um 6 Uhr auf.",
+    "Infinitiv-ல் ஒன்றாக இருக்கும்: anrufen, aufstehen."
+  ],
+  diagram_de: `Trennbares Verb
+
+anrufen
+
+Ich   rufe   ihn   an.
+     └─────────────┘
+        Verb + Vorsilbe
+
+aufstehen
+
+Wir   stehen   um 6 Uhr   auf.
+      └──────────────────────┘
+         Verb + Vorsilbe
+
+einkaufen
+
+Ich   kaufe   im Supermarkt   ein.
+     └──────────────────────────┘
+        Verb + Vorsilbe`,
+  quiz: [
+    { q: "Ich rufe ihn ___.", options: ["an","auf","ein"], answer: "an" },
+    { q: "Ich stehe um 7 Uhr ___.", options: ["auf","an","ein"], answer: "auf" },
+    { q: "Wir kaufen im Supermarkt ___.", options: ["ein","an","mit"], answer: "ein" },
+    { q: "Der Kurs fängt um 9 Uhr ___.", options: ["an","aus","ein"], answer: "an" },
+    { q: "Hör mir bitte ___.", options: ["zu","an","aus"], answer: "zu" },
+    { q: "Ich mache die Tür ___.", options: ["auf","ab","ein"], answer: "auf" },
+    { q: "Mach das Licht ___.", options: ["an","aus","auf"], answer: "an" },
+    { q: "Ich mache den Computer ___.", options: ["aus","auf","an"], answer: "aus" },
+    { q: "Ich lade dich ___.", options: ["ein","aus","an"], answer: "ein" },
+    { q: "Der Bus kommt um 8 Uhr ___.", options: ["an","aus","ein"], answer: "an" },
+    { q: "Wir steigen an der Haltestelle ___.", options: ["aus","ein","auf"], answer: "aus" },
+    { q: "Ich hole dich um 5 Uhr ___.", options: ["ab","an","auf"], answer: "ab" },
+    { q: "Bitte ruf mich später ___.", options: ["an","auf","zu"], answer: "an" },
+    { q: "Wir räumen das Zimmer ___.", options: ["auf","ab","ein"], answer: "auf" },
+    { q: "Ich schalte den Fernseher ___.", options: ["ein","aus","an"], answer: "ein" },
+    { q: "Ich schalte das Radio ___.", options: ["aus","ein","ab"], answer: "aus" },
+
+    { q: "Ich ___ dich an.", options: ["rufe","besuche","verstehe"], answer: "rufe" },
+    { q: "Er ___ um 6 Uhr auf.", options: ["steht","geht","macht"], answer: "steht" },
+    { q: "Wir ___ im Supermarkt ein.", options: ["kaufen","machen","lernen"], answer: "kaufen" },
+    { q: "Der Film ___ um 20 Uhr an.", options: ["fängt","lernt","geht"], answer: "fängt" },
+    { q: "Sie ___ die Fenster zu.", options: ["macht","ruft","geht"], answer: "macht" },
+    { q: "Ich ___ die Jacke an.", options: ["ziehe","nehme","höre"], answer: "ziehe" },
+    { q: "Wir ___ nach Hause zurück.", options: ["kommen","lernen","machen"], answer: "kommen" },
+    { q: "Er ___ das Handy aus.", options: ["macht","ruft","kauft"], answer: "macht" }
+  ]
+},
+
 
 {
   id: "A1-TA-Explain",

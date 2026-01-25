@@ -257,6 +257,60 @@ function getLessonExplanation(lesson) {
   return { de, ta, en };
 }
 
+function getLessonDiagramText(lesson) {
+  if (lesson && lesson.diagram_de) return String(lesson.diagram_de);
+  return buildAutoDiagram(lesson);
+}
+
+function buildAutoDiagram(lesson) {
+  const quiz = Array.isArray(lesson?.quiz) ? lesson.quiz : [];
+  const highlighted = [];
+  const plain = [];
+
+  for (const q of quiz) {
+    if (highlighted.length + plain.length >= 3) break;
+    const type = String(q?.type || "mc").toLowerCase();
+    const answer = String(q?.answer || "").trim();
+    let sentence = "";
+
+    if (type === "wordorder" && q?.answer) {
+      sentence = String(q.answer).trim();
+    } else if (q?.q && String(q.q).includes("___") && answer) {
+      sentence = fillBlank(q.q, answer).trim();
+    } else if (type === "write" && q?.answer) {
+      sentence = String(q.answer).trim();
+    } else if (q?.q && answer) {
+      sentence = fillBlank(q.q, answer).trim();
+    }
+
+    if (!sentence) continue;
+
+    if (answer) {
+      const idx = sentence.indexOf(answer);
+      if (idx >= 0 && answer.length < sentence.length) {
+        highlighted.push({ sentence, answer, start: idx });
+        continue;
+      }
+    }
+
+    plain.push({ sentence });
+  }
+
+  if (!highlighted.length && !plain.length) return "";
+
+  const parts = ["Beispiele"];
+  const items = [...highlighted, ...plain].slice(0, 3);
+  for (const item of items) {
+    parts.push("", item.sentence);
+    if (item.answer && typeof item.start === "number") {
+      const underline = " ".repeat(item.start) + "└" + "─".repeat(item.answer.length) + "┘";
+      parts.push(underline);
+    }
+  }
+
+  return parts.join("\n");
+}
+
 function getGrammarLangPref() {
   return localStorage.getItem("grammarLang") || "de";
 }
@@ -274,6 +328,10 @@ function renderLessonGrammarBox(lesson) {
   const deHtml = exp.de.map(line => escapeHtml(line)).join("<br>");
   const taHtml = exp.ta.map(line => escapeHtml(line)).join("<br>");
   const enHtml = exp.en.map(line => escapeHtml(line)).join("<br>");
+  const diagramText = getLessonDiagramText(lesson);
+  const diagramHtml = diagramText
+    ? `<pre class="grammar-diagram">${escapeHtml(diagramText)}</pre>`
+    : "";
 
   let content = `<b>Grammatik (Deutsch):</b><br>${deHtml}`;
   if (lang === "de-en" && exp.en.length) {
@@ -281,6 +339,9 @@ function renderLessonGrammarBox(lesson) {
   }
   if (lang === "de-ta") {
     content += `<br><br><b>இலக்கணம் (Tamil):</b><br>${taHtml}`;
+  }
+  if (diagramHtml) {
+    content += `<br><br>${diagramHtml}`;
   }
 
   box.innerHTML = `
